@@ -1,0 +1,4 @@
+title: Text
+icon: text
+fields:
+  textarea: true
