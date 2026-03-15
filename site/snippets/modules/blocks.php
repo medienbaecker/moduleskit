@@ -1,3 +1,3 @@
 <div id="<?= $module->slug() ?>" class="<?= $module->moduleId() ?>">
-  <?= $module->textarea()->kt() ?>
+  <?= $module->blocks()->toBlocks() ?>
 </div>

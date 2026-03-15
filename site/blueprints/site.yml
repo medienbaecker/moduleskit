@@ -1,6 +1,10 @@
 title: Site
 
 sections:
+  modules:
+    type: modules
+    headline: Site-wide Modules
+    default: text
+    max: 3
   pages:
-    type: pages
-    create: default
+    templatesIgnore: modules

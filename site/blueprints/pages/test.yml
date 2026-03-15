@@ -1,0 +1,14 @@
+title: Test Page
+
+sections:
+  modules:
+    label: Modules
+    type: modules
+    default: text
+    help: "`modules`"
+
+  modules2:
+    label: Also modules
+    type: modules
+    default: images
+    help: "`modules2`"

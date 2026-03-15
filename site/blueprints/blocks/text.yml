@@ -1,14 +1,17 @@
-title: Text
+name: Text
+preview: fields
+wysiwyg: true
 icon: text
 tabs:
   content:
     fields:
+      headline:
+        type: text
       textarea: true
   settings:
     fields:
       background:
         type: select
-        translate: false
         options:
           light: Light
           dark: Dark

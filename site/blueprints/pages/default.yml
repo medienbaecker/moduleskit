@@ -1,4 +1,10 @@
 title: Default Page
 
 sections:
-  modules: true
+  modules:
+    default: text
+
+  fields:
+    type: fields
+    fields:
+      blocks: true

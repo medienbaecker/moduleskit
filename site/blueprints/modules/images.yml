@@ -1,4 +1,14 @@
 title: Images
 icon: images
-sections:
-  files: true
+columns:
+  - width: 1/2
+    fields:
+      title:
+        label: Title
+        type: text
+      images:
+        label: Images
+        type: files
+  - width: 1/2
+    sections:
+      files: true

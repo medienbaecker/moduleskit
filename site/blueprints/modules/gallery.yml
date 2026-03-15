@@ -1,0 +1,10 @@
+title: Gallery
+icon: image
+sections:
+  content:
+    type: fields
+    fields:
+      caption:
+        type: text
+        placeholder: Gallery caption…
+  files: true

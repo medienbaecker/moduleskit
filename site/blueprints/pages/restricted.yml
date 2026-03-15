@@ -1,0 +1,25 @@
+title: Restricted Page
+
+sections:
+  modules:
+    type: modules
+    headline: Text Modules
+    templates:
+      - module.text
+      - module.text-buttons
+      - module.quote
+    default: text
+    min: 1
+    max: 5
+    empty: No text modules yet
+
+  media:
+    type: modules
+    headline: Media Modules
+    templatesIgnore:
+      - text
+      - text-buttons
+      - quote
+      - blocks
+    default: images
+    max: 3

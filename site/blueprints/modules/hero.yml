@@ -1,14 +1,18 @@
-title: Text
-icon: text
+title: Hero
+icon: image
 tabs:
   content:
+    label: Content
     fields:
-      textarea: true
+      heading:
+        type: text
+      text:
+        type: textarea
   settings:
+    label: Settings
     fields:
       background:
         type: select
-        translate: false
         options:
           light: Light
           dark: Dark

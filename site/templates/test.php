@@ -1,7 +1,9 @@
 <?php snippet('header') ?>
 <h1><?= $page->title() ?></h1>
 
-<?php if ($page->hasModules()): ?>
-  <?= $page->modules() ?>
-<?php endif ?>
+<?= $page->modules() ?>
+
+<hr>
+
+<?= $page->modules('modules2') ?>
 <?php snippet('footer') ?>
