@@ -4,7 +4,7 @@ A small example site for [Kirby Modules](https://github.com/medienbaecker/kirby-
 
 ## A note on licenses
 
-Both [Kirby](https://getkirby.com) itself and the kirby-modules plugin are commercial. They're free to use on your local machine while you're trying things out, but going live with either one needs a paid licence:
+Both [Kirby](https://getkirby.com) itself and the Modules plugin are commercial. They're free to use on your local machine while you're trying things out, but going live with either one needs a paid licence:
 
 - Kirby: <https://getkirby.com/buy>
 - Kirby Modules: <https://medienbaecker.com/plugins/modules>
@@ -17,9 +17,7 @@ Both [Kirby](https://getkirby.com) itself and the kirby-modules plugin are comme
 git clone https://github.com/medienbaecker/modules-example.git moduleskit
 ```
 
-Drop the folder into [Herd](https://herd.laravel.com), MAMP or XAMPP and open it in the browser. The Panel lives at `/panel`.
-
-Kirby and the plugin are bundled, so there's nothing to install.
+You can then follow the [quickstart guide](https://getkirby.com/docs/guide/quickstart) in Kirby's docs.
 
 ## What's where
 
