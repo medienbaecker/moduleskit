@@ -204,6 +204,8 @@
 	"error.page.undefined": "\ud398\uc774\uc9c0\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
 	"error.page.update.permission": "페이지({slug})를 변경할 권한이 없습니다.",
 
+	"error.role.notFound": "The role \"{name}\" cannot be found",
+
 	"error.section.files.max.plural": "이 섹션({section})에는 파일을 {max}개 이상 추가할 수 없습니다.",
 	"error.section.files.max.singular": "이 섹션({section})에는 파일을 하나 이상 추가할 수 없습니다.",
 	"error.section.files.min.plural": "이 섹션({section})에는 파일이 {min}개 이상 필요합니다.",
@@ -219,6 +221,7 @@
 
 	"error.site.changeTitle.empty": "제목을 입력하세요.",
 	"error.site.changeTitle.permission": "사이트명을 변경할 권한이 없습니다.",
+	"error.site.notAccessible": "The site is not accessible",
 	"error.site.update.permission": "사이트 정보를 변경할 권한이 없습니다.",
 
 	"error.structure.validation": "{index}번째 필드({field})에 오류가 있습니다.",
@@ -298,7 +301,7 @@
 	"error.validation.uuid": "올바른 UUID를 입력하세요.",
 	"error.validation.url": "올바른 URL을 입력하세요.",
 
-	"error.version.discard.permission": "이 버전을 복구할 권한이 없습니다.",
+	"error.version.discard.permission": "이 버전을 무시할 권한이 없습니다.",
 	"error.version.publish.permission": "이 버전을 공개할 권한이 없습니다.",
 	"error.version.save.permission": "이 버전을 변경할 권한이 없습니다.",
 
@@ -408,8 +411,8 @@
 
 	"filter": "필터",
 
-	"form.discard": "저장되지 않은 항목이 있습니다.",
-	"form.discard.confirm": "<strong>저장되지 않은 내용</strong>을 삭제할까요?",
+	"form.discard": "변경 사항 무시",
+	"form.discard.confirm": "<strong>저장되지 않은 내용</strong>을 무시할까요?",
 	"form.locked": "다른 사용자가 편집 중입니다.",
 	"form.unsaved": "변경 사항이 저장되지 않았습니다.",
 	"form.preview": "변경 사항 미리 보기",

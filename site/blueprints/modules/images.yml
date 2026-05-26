@@ -1,14 +1,9 @@
+# Modules can have their own files, so a files section
+# turns this module into a small gallery.
+
 title: Images
-icon: images
-columns:
-  - width: 1/2
-    fields:
-      title:
-        label: Title
-        type: text
-      images:
-        label: Images
-        type: files
-  - width: 1/2
-    sections:
-      files: true
+icon: image
+
+sections:
+  files:
+    layout: cards

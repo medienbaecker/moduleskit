@@ -1,14 +1,6 @@
 title: Text
 icon: text
-tabs:
-  content:
-    fields:
-      textarea: true
-  settings:
-    fields:
-      background:
-        type: select
-        translate: false
-        options:
-          light: Light
-          dark: Dark
+
+fields:
+  textarea:
+    label: Text

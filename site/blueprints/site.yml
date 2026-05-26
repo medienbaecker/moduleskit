@@ -1,10 +1,10 @@
+# You'll want to define which templates users can create
+# by using `create`, `templates` or `templatesIgnore`,
+# otherwise your modules will show up here, too.
+
 title: Site
 
 sections:
-  modules:
-    type: modules
-    headline: Site-wide Modules
-    default: text
-    max: 3
   pages:
-    templatesIgnore: modules
+    type: pages
+    create: default

@@ -1,18 +1,21 @@
+# `model.filePool` makes the picker show files from the
+# (grand)parent page instead of the module's own files.
+
 title: Hero
 icon: image
-tabs:
-  content:
-    label: Content
-    fields:
-      heading:
-        type: text
-      text:
-        type: textarea
-  settings:
-    label: Settings
-    fields:
-      background:
-        type: select
-        options:
-          light: Light
-          dark: Dark
+
+fields:
+  headline:
+    label: Headline
+    type: text
+  text:
+    label: Text
+    type: textarea
+  cover:
+    label: Cover image
+    type: files
+    query: model.filePool
+    uploads:
+      parent: model.filePool.parent
+    max: 1
+    layout: cards

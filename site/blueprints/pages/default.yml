@@ -1,10 +1,11 @@
+# The `modules` picks up every blueprint in `site/blueprints/modules/`.
+
 title: Default Page
-
-sections:
-  modules:
-    default: text
-
-  fields:
-    type: fields
-    fields:
-      blocks: true
+tabs:
+  content:
+    sections:
+      modules:
+        default: text
+  files:
+    sections:
+      files: true
