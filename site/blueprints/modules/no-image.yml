@@ -1,0 +1,6 @@
+title: Module without image
+icon: asterisk
+
+fields:
+  textarea:
+    label: Text

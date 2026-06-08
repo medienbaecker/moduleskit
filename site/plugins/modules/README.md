@@ -117,11 +117,17 @@ Use `$module->slug()` as the element ID in your module snippet:
 
 The slug is editable in the Panel via the `#anchor` button on each module card or the "Change anchor" button in the toolbar's dropdown.
 
+## Preview images
+
+Add preview images to make the create and "Change type" dialogs show a visual grid instead of a dropdown. Drop images into `assets/module-previews/`, named after the module – for example `text.png` for `text.yml`/`text.php`. Any image format works; a 16:9 ratio looks best.
+
+Types without a matching image fall back to their blueprint `icon`. If no type has a preview image, the dialogs keep the plain dropdown — so this is fully opt-in.
+
 ## Visibility
 
 Each module's visibility can be toggled with a single click on its card. Hidden modules stay in place — they keep their sort position and any inline edits — but the frontend skips over them when iterating `$page->modules()`. The card shows a striped background while a module is hidden.
 
-Hidden modules get a signed preview URL (token + `_module` query param) so authors can verify them on the live URL without Panel login. The preview button appears in the card's toolbar only while the module is hidden — visible modules render via their parent's URL.
+Every module's card has a preview button in its toolbar. Visible modules link to the module's anchor on the live parent page. Hidden modules get a signed preview URL (token + `_module` query param) instead, so authors can verify them on the live URL without Panel login.
 
 ## Section Options
 
@@ -218,3 +224,7 @@ class ModuletextPage extends Medienbaecker\Modules\ModulePage {
   // your methods
 }
 ```
+
+## Credits
+
+The visual type picker was inspired by [Juno](https://juno-hamburg.com)'s [Visual Block Selector](https://github.com/junohamburg/kirby-visual-block-selector).
