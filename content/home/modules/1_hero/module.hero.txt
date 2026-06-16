@@ -1,14 +1,12 @@
-Headline: Welcome to moduleskit
+Headline: Hello world!
 
 ----
 
-Text: A small, fully working example of the kirby-modules plugin. Have a poke around the Panel.
+Text: Test!
 
 ----
 
-Cover:
-
-- file://414m95mnoqhwemvi
+Cover: 
 
 ----
 
