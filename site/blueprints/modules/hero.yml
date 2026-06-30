@@ -1,8 +1,15 @@
-# `model.filePool` makes the picker show files from the
-# (grand)parent page instead of the module's own files.
-
 title: Hero
 icon: image
+
+# Show the headline field's value instead of "Hero"
+label: "{{ module.headline }}"
+
+create:
+  # Show the headline field in the create dialog
+  fields:
+    - headline
+  # Automatically set the anchor and hide it
+  anchor: "{{ module.headline }}"
 
 fields:
   headline:
@@ -14,8 +21,9 @@ fields:
   cover:
     label: Cover image
     type: files
+    # `model.filePool` makes the picker show files from the
+    # (grand)parent page instead of the module's own files.
     query: model.filePool
     uploads:
       parent: model.filePool.parent
     max: 1
-    layout: cards

@@ -1,12 +1,14 @@
-Headline: Hello world!
+Headline: Modular page building
 
 ----
 
-Text: Test!
+Text: Every module is a regular Kirby page, edited inline on its parent.
 
 ----
 
-Cover: 
+Cover:
+
+- file://414m95mnoqhwemvi
 
 ----
 

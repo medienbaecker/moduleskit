@@ -1,9 +1,13 @@
-# Modules can have their own files, so a files section
-# turns this module into a small gallery.
-
 title: Images
 icon: image
 
-sections:
-  files:
+fields:
+  gallery:
+    label: Images
+    type: files
+    # `model.filePool` makes the picker show files from the
+    # (grand)parent page instead of the module's own files.
+    query: model.filePool
+    uploads:
+      parent: model.filePool.parent
     layout: cards

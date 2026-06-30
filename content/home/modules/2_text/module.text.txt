@@ -1,4 +1,4 @@
-Textarea: A tiny Kirby site that demonstrates (link: https://github.com/medienbaecker/kirby-modules text: Kirby Modules).
+Textarea: Each module has its own blueprint and snippet. Add, sort and edit them inline, just like blocks.
 
 ----
 
