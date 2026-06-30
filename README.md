@@ -11,10 +11,10 @@ Both [Kirby](https://getkirby.com) itself and the Modules plugin are commercial.
 
 ## Get going
 
-[Download the ZIP](https://github.com/medienbaecker/modules-example/archive/refs/heads/main.zip) or clone the repo:
+[Download the ZIP](https://github.com/medienbaecker/moduleskit/archive/refs/heads/main.zip) or clone the repo:
 
 ```sh
-git clone https://github.com/medienbaecker/modules-example.git moduleskit
+git clone https://github.com/medienbaecker/moduleskit.git moduleskit
 ```
 
 You can then follow the [quickstart guide](https://getkirby.com/docs/guide/quickstart) in Kirby's docs.
