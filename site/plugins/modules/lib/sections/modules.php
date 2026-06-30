@@ -4,13 +4,13 @@ use Kirby\Cms\Blueprint;
 use Kirby\Cms\Site;
 use Kirby\Toolkit\I18n;
 use Medienbaecker\Modules\ModuleRegistry;
-use Medienbaecker\Modules\ModuleSectionApi;
+use Medienbaecker\Modules\ModuleSectionRoutes;
 use Medienbaecker\Modules\ModuleSectionItem;
 
 $allBlueprints = array_values(array_map(
   fn(string $name) => substr($name, strlen('pages/')),
   array_filter(
-    array_keys(ModuleRegistry::create()['blueprints']),
+    array_keys(ModuleRegistry::load()['blueprints']),
     fn(string $name) => str_starts_with($name, 'pages/module.')
   )
 ));
@@ -22,19 +22,24 @@ return [
     'default' => fn(?string $default = null) => $default,
     'templatesIgnore' => fn(array $templatesIgnore = []) => $templatesIgnore,
 
+    // The sort mixin reads $this->query, which core's pages section defines
+    // as a prop (no mixin does) — declare it so the dependency is explicit.
+    'query' => fn() => null,
+
+    // Both short ('text') and full ('module.text') names are accepted here,
+    // in templatesIgnore and in default.
     'templates' => function ($templates = null) use ($allBlueprints) {
-      $blueprints = $templates ?? $allBlueprints;
+      $blueprints = $templates
+        ? array_map(fn($name) => ModuleRegistry::qualify($name), $templates)
+        : $allBlueprints;
 
       if ($this->templatesIgnore) {
-        $blueprints = array_values(array_filter($blueprints, function ($name) {
-          $short = preg_replace('/^module\./', '', $name);
-          return !in_array($short, $this->templatesIgnore, true)
-            && !in_array($name, $this->templatesIgnore, true);
-        }));
+        $ignore = array_map(fn($name) => ModuleRegistry::qualify($name), $this->templatesIgnore);
+        $blueprints = array_values(array_diff($blueprints, $ignore));
       }
 
       if ($this->default) {
-        $name = 'module.' . $this->default;
+        $name = ModuleRegistry::qualify($this->default);
         if (in_array($name, $blueprints, true)) {
           $blueprints = array_values(array_unique(array_merge([$name], $blueprints)));
         }
@@ -76,9 +81,25 @@ return [
   ],
 
   'computed' => [
-    'total' => fn() => count($this->modules ?? []),
+    // Computed props evaluate in definition order; `modules` must come
+    // first because `total` (and through it `add` and `errors`) reads it.
+    'modules' => function () {
+      $modulesPage = $this->model()->find($this->name);
+      if (!$modulesPage) return [];
+
+      $modules = [];
+      foreach ($modulesPage->children() as $child) {
+        $modules[] = ModuleSectionItem::for($child);
+      }
+      return $modules;
+    },
+
+    'total' => fn() => count($this->modules),
     'add'   => fn() => !$this->isFull(),
 
+    // Verbatim copy of core's pages section errors computed (sections can't
+    // inherit from each other) — keep in sync with
+    // kirby/config/sections/pages.php on Kirby updates.
     'errors' => function () {
       $errors = [];
 
@@ -107,21 +128,10 @@ return [
         ]
       ];
     },
-
-    'modules' => function () {
-      $modulesPage = $this->model()->find($this->name);
-      if (!$modulesPage) return [];
-
-      $modules = [];
-      foreach ($modulesPage->children() as $child) {
-        $modules[] = ModuleSectionItem::for($child);
-      }
-      return $modules;
-    },
   ],
 
   'api' => function () {
-    return ModuleSectionApi::routes();
+    return ModuleSectionRoutes::routes();
   },
 
   'toArray' => function () {

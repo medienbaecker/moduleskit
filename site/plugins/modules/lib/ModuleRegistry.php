@@ -2,17 +2,18 @@
 
 namespace Medienbaecker\Modules;
 
+use Kirby\Data\Data;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Filesystem\Dir;
 use Kirby\Filesystem\F;
 use Kirby\Toolkit\Str;
-use Kirby\Data\Yaml;
 
 class ModuleRegistry
 {
   private static ?array $cache = null;
   private static ?array $previews = null;
 
-  public static function create(): array
+  public static function load(): array
   {
     if (self::$cache !== null) {
       return self::$cache;
@@ -38,17 +39,18 @@ class ModuleRegistry
     }
 
     // Default changeTemplate to all module blueprints unless one is declared.
-    $blueprintNames = array_keys($registry['blueprints']);
-    $blueprintNames = array_map(fn($name) => Str::replace($name, 'pages/', ''), $blueprintNames);
+    $blueprintNames = array_map(
+      fn($name) => str_replace('pages/', '', $name),
+      array_keys($registry['blueprints'])
+    );
 
     foreach ($registry['blueprints'] as &$blueprint) {
-      if (
-        !isset($blueprint['options']) ||
-        (is_array($blueprint['options']) && !isset($blueprint['options']['changeTemplate']))
-      ) {
+      $options = $blueprint['options'] ?? [];
+      if (is_array($options) && !isset($options['changeTemplate'])) {
         $blueprint['options']['changeTemplate'] = $blueprintNames;
       }
     }
+    unset($blueprint);
 
     $registry['blueprints']['pages/modules'] = [
       'title' => 'Modules',
@@ -76,7 +78,7 @@ class ModuleRegistry
 
   public static function hasBlueprint(string $template): bool
   {
-    return isset(self::create()['blueprints']['pages/' . $template]);
+    return isset(self::load()['blueprints']['pages/' . $template]);
   }
 
   // Maps a module's short name to a preview image URL by scanning
@@ -109,17 +111,38 @@ class ModuleRegistry
     $shortName = str_replace('module.', '', $template);
     return [
       'preview' => self::previewImages()[$shortName] ?? null,
-      'icon'    => self::create()['blueprints']['pages/' . $template]['icon'] ?? 'box',
+      'icon'    => self::load()['blueprints']['pages/' . $template]['icon'] ?? 'box',
     ];
+  }
+
+  // 'text' and 'module.text' are interchangeable in all plugin options;
+  // this returns the full template name.
+  public static function qualify(string $name): string
+  {
+    return Str::startsWith($name, 'module.') ? $name : 'module.' . $name;
+  }
+
+  // Like qualify(), but for creating modules: throws when the type is
+  // missing or has no blueprint.
+  public static function template(?string $type): string
+  {
+    if (!$type) {
+      throw new InvalidArgumentException('Module type is required');
+    }
+
+    $template = self::qualify($type);
+    if (!self::hasBlueprint($template)) {
+      throw new InvalidArgumentException('Unknown module type "' . $type . '"');
+    }
+
+    return $template;
   }
 
   public static function add(array $registry, string $name, string $blueprintPath, string $snippetPath): array
   {
-    if (array_key_exists('pages/module.' . $name, $registry['blueprints'])) {
-      return $registry;
-    }
+    $name = self::qualify($name);
 
-    if (!F::exists($blueprintPath)) {
+    if (isset($registry['blueprints']['pages/' . $name]) || !F::exists($blueprintPath)) {
       return $registry;
     }
 
@@ -129,19 +152,16 @@ class ModuleRegistry
       'icon' => 'box',
       'buttons' => ['open', 'preview', '-', 'settings', 'languages', 'modules.visibility'],
     ];
-    $blueprintArray = array_merge($defaults, Yaml::read($blueprintPath));
+    $blueprintArray = array_merge($defaults, Data::read($blueprintPath));
 
-    if (!array_key_exists('create', $blueprintArray)) {
-      $blueprintArray['create'] = [
-        'title'    => '{{ page.blueprint.title }}',
-        'status'   => 'listed',
-        'redirect' => false,
-      ];
-    }
-
-    if (Str::startsWith($name, 'module.') === false) {
-      $name = 'module.' . $name;
-    }
+    // Force status/redirect (modules are always listed; visibility is the
+    // `hidden` flag) while keeping any author-supplied create config.
+    $create = $blueprintArray['create'] ?? null;
+    $create = is_array($create) ? $create : [];
+    $blueprintArray['create'] = array_merge($create, [
+      'status'   => 'listed',
+      'redirect' => false,
+    ]);
 
     $shortName = str_replace('module.', '', $name);
 
@@ -158,17 +178,17 @@ class ModuleRegistry
   // e.g. 'text', 'text-2', 'text-3'
   public static function generateSlug(string $parentId, string $template): ?string
   {
-    return self::buildSlug($parentId, Str::slug(str_replace('module.', '', $template)));
+    return self::uniqueSlug($parentId, Str::slug(str_replace('module.', '', $template)));
   }
 
   // Base on the source slug so #anchor duplicates as #anchor-2. The trailing
   // -N is stripped first so #anchor-2 yields #anchor-3, not #anchor-2-2.
   public static function duplicateSlug(string $parentId, string $sourceSlug): ?string
   {
-    return self::buildSlug($parentId, preg_replace('/-\d+$/', '', $sourceSlug));
+    return self::uniqueSlug($parentId, preg_replace('/-\d+$/', '', $sourceSlug));
   }
 
-  private static function buildSlug(string $parentId, string $slug): ?string
+  public static function uniqueSlug(string $parentId, string $slug): ?string
   {
     $parentId = str_replace('+', '/', $parentId);
     $parentId = preg_replace('#^pages/#', '', $parentId);
@@ -177,11 +197,10 @@ class ModuleRegistry
       return null;
     }
 
-    $siblings = $parent->children();
-    if ($siblings->findBy('slug', $slug)) {
-      $i = 2;
-      while ($siblings->findBy('slug', $slug . '-' . $i)) $i++;
-      $slug = $slug . '-' . $i;
+    // Match PageRules::create(), which checks the slug against drafts too.
+    $siblings = $parent->childrenAndDrafts();
+    while ($siblings->findBy('slug', $slug)) {
+      $slug = Str::increment($slug, '-', 2);
     }
     return $slug;
   }

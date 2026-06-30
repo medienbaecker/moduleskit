@@ -2,9 +2,30 @@
 
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
+use Medienbaecker\Modules\ModuleRegistry;
+use Medienbaecker\Modules\ModuleSectionRoutes;
 use Medienbaecker\Modules\ModulesCollection;
 
 return [
+
+  // Creates a real, persisted module (unlike Module::factory, which is
+  // render-only). The container is created when missing, same as in the Panel.
+  'createModule' => function (array $props, string $container = 'modules') {
+    $modulesContainer = $this->find($container)
+      ?? ModuleSectionRoutes::createContainer($this, $container);
+
+    $template = ModuleRegistry::template($props['type'] ?? $props['template'] ?? null);
+
+    // createChild always creates a draft; the blueprint's create.status
+    // is Panel-only, so list the module explicitly.
+    $module = kirby()->impersonate('kirby', fn() => $modulesContainer->createChild([
+      'slug'     => $props['slug'] ?? ModuleRegistry::generateSlug($modulesContainer->id(), $template),
+      'template' => $template,
+      'content'  => $props['content'] ?? [],
+    ])->changeStatus('listed'));
+
+    return ModuleSectionRoutes::applyAutopublish($module);
+  },
 
   'renderModules' => function (string|array $containerOrParams = 'modules', array $params = []) {
     [$container, $params] = is_array($containerOrParams)
@@ -12,7 +33,7 @@ return [
       : [$containerOrParams, $params];
 
     foreach ($this->modules($container) as $module) {
-      echo $module->renderModule($params);
+      $module->renderModule($params);
     }
   },
 
@@ -42,9 +63,8 @@ return [
       if (!kirby()->user() && !$tokenValid) $previewSlug = null;
     }
 
-    $language = kirby()->defaultLanguage()?->code();
     foreach ($modulesContainer->children() as $module) {
-      if ($module->content($language)->hidden()->toBool() && $module->slug() !== $previewSlug) continue;
+      if ($module->isHidden() && $module->slug() !== $previewSlug) continue;
       $modules->append($module);
     }
     return $modules;
@@ -52,6 +72,18 @@ return [
 
   'isModule' => function () {
     return str_starts_with($this->intendedTemplate()->name(), 'module.');
+  },
+
+  // The hidden page holding a section's modules as children.
+  'isModuleContainer' => function () {
+    return $this->intendedTemplate()->name() === 'modules';
+  },
+
+  // Hidden state lives on the default language only — content(null) would
+  // read the current Panel language instead.
+  'isHidden' => function () {
+    $language = kirby()->defaultLanguage()?->code();
+    return $this->content($language)->hidden()->toBool();
   },
 
   'filePool' => function () {

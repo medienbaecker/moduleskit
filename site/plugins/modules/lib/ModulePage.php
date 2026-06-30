@@ -14,8 +14,7 @@ class ModulePage extends Page
 {
   public function previewUrl(VersionId|string $versionId = 'latest'): string|null
   {
-    $language = kirby()->defaultLanguage()?->code();
-    if (!$this->content($language)->hidden()->toBool()) {
+    if (!$this->isHidden()) {
       return parent::previewUrl($versionId);
     }
 
@@ -45,12 +44,11 @@ class ModulePage extends Page
     array $data = [],
     $contentType = 'html',
     VersionId|string|null $versionId = null
-  ): string {
+  ): never {
     $parentUrl = $this->page()->url();
     $query = [];
 
-    $language = kirby()->defaultLanguage()?->code();
-    $hidden = $this->content($language)->hidden()->toBool();
+    $hidden = $this->isHidden();
     $token = (string) get('_token');
     $version = (string) get('_version');
 
@@ -75,23 +73,19 @@ class ModulePage extends Page
   public function toHtml(array $params = []): string
   {
     $name = str_replace('module.', '', $this->intendedTemplate()->name());
+    $render = fn(): string => snippet('modules/' . $name, [
+      'page' => $this->parents()->first() ?? $this->site(),
+      'module' => $this,
+      ...$params
+    ], true);
 
     // Force the changes version during a verified preview so authors see
     // pending edits before publish.
-    $previousRender = VersionId::$render;
     if ($this->isChangesPreviewRequest()) {
-      VersionId::$render = VersionId::changes();
+      return VersionId::render(VersionId::changes(), $render);
     }
 
-    try {
-      return snippet('modules/' . $name, [
-        'page' => $this->parents()->first() ?? $this->site(),
-        'module' => $this,
-        ...$params
-      ], true);
-    } finally {
-      VersionId::$render = $previousRender;
-    }
+    return $render();
   }
 
   private function isChangesPreviewRequest(): bool
@@ -119,8 +113,26 @@ class ModulePage extends Page
     return ModuleRegistry::hasBlueprint($this->intendedTemplate()->name());
   }
 
+  private bool $resolvingTitle = false;
+
   public function title(): Field
   {
+    // The flag stops a `label` of {{ module.title }} recursing back into title().
+    if ($this->resolvingTitle === false && $this->hasTemplate()) {
+      $label = $this->blueprint()->label();
+      if (is_string($label)) {
+        $this->resolvingTitle = true;
+        try {
+          $resolved = $this->toSafeString($label, ['module' => $this]);
+        } finally {
+          $this->resolvingTitle = false;
+        }
+        if ($resolved !== '') {
+          return new Field($this, 'title', $resolved);
+        }
+      }
+    }
+
     return new Field($this, 'title', $this->moduleName());
   }
 
