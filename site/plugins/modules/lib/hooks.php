@@ -1,5 +1,6 @@
 <?php
 
+use Kirby\Cms\Page;
 use Kirby\Content\LockedContentException;
 use Kirby\Exception\PermissionException;
 use Kirby\Panel\Panel;
@@ -30,6 +31,16 @@ return [
         // The mirror must never break the module operation itself
       }
     }
+
+    // Separate from the sync branch above: sync re-locks the host as the
+    // leaving user, which would undo the auto-unlock.
+    if ($method === 'POST' && $model = HostLock::modelFromUnlockPath($path)) {
+      try {
+        HostLock::cascadeUnlock($model);
+      } catch (Throwable) {
+      }
+    }
+
     return $result;
   },
 
@@ -69,6 +80,10 @@ return [
 
   'page.move:before' => function ($page, $parent) {
     if (!$page->isModule()) return;
+
+    if (!$parent instanceof Page || !$parent->isModuleContainer()) {
+      throw new PermissionException(t('modules.move.notallowed'));
+    }
 
     $host = $parent->parentModel();
     $targetSection = null;

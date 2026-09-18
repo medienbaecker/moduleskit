@@ -20,15 +20,16 @@ class ModuleSectionItem
       'hasTemplate'       => $hasTemplate,
       // Card label = the module title (live `label` or type name); else "missing".
       'moduleName'        => $blueprint ? (string) $child->title() : I18n::translate('modules.missingTemplate'),
-      'icon'              => $blueprint ? ($blueprint->icon() ?? 'box') : 'alert',
+      'icon'              => $blueprint ? $blueprint->icon() : 'alert',
       'hidden'            => $child->isHidden(),
       'hasFields'         => $blueprint && !empty($blueprint->fields()),
       'hasPendingChanges' => $child->version('changes')->exists('*'),
       'tabs'              => $blueprint ? $blueprint->tabs() : [],
       'link'              => $child->panel()->url(),
-      'permissions'       => $child->panel()->options(['preview']),
-      // The host page lock covers the UI; this only guards adoption
-      // in reconcileState() while no mirror exists yet.
+      'permissions'       => [
+        ...$child->panel()->options(['preview']),
+        'move' => ModuleSectionRoutes::canMove($child),
+      ],
       'isLocked'          => $child->lock()?->isLocked() ?? false,
       'previewUrl'        => self::previewUrl($child),
     ];
