@@ -21,6 +21,8 @@ fields:
   cover:
     label: Cover image
     type: files
+    image:
+      cover: true
     # `model.filePool` makes the picker show files from the
     # (grand)parent page instead of the module's own files.
     query: model.filePool
